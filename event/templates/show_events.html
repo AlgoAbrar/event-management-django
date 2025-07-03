@@ -1,0 +1,94 @@
+{% extends "dashboard.html" %}
+{% block title %}Events{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold text-gray-800 mb-6">Events</h1>
+
+<!-- Search Add Button -->
+<form method="GET" class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+    <input
+        type="text"
+        name="search"
+        placeholder="Search by name or location"
+        value="{{ search_query }}"
+        class="w-full sm:w-auto border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+    />
+    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium">
+        Search
+    </button>
+    <a href="{% url 'event-create' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium ">
+         Add Event
+    </a>
+</form>
+
+<!-- Event Table -->
+<div class="overflow-x-auto">
+    <table class="w-full bg-white shadow-md rounded-xl mb-6 text-sm md:text-base">
+        <thead class="bg-gray-100 text-gray-700">
+            <tr class="text-left border-b">
+                <th class="p-4">Name</th>
+                <th class="p-4">Category</th>
+                <th class="p-4">Participants</th>
+                <th class="p-4">Date</th>
+                <th class="p-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-4">{{ event.name }}</td>
+                <td class="p-4">{{ event.category.name }}</td>
+                <td class="p-4">{{ event.participants.count }}</td>
+                <td class="p-4">{{ event.date }}</td>
+                <td class="p-4 space-x-3 whitespace-nowrap">
+                    <a href="{% url 'event-detail' event.id %}" class="text-green-600 hover:underline font-medium">Details</a>
+                    <a href="{% url 'event-update' event.id %}" class="text-blue-600 hover:underline font-medium">Edit</a>
+                    <a href="{% url 'event-delete' event.id %}" class="text-red-600 hover:underline font-medium">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center p-6 text-gray-500">No events found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Event Detail -->
+{% if event %}
+<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-6">
+    <h2 class="text-3xl font-bold text-gray-800">{{ event.name }}</h2>
+
+    <div class="text-gray-700 space-y-2">
+        <p><strong>Description:</strong> {{ event.description }}</p>
+        <p><strong>Date & Time:</strong> {{ event.date }} {{ event.time }}</p>
+        <p><strong>Location:</strong> {{ event.location }}</p>
+        <p><strong>Category:</strong> {{ event.category.name }}</p>
+    </div>
+
+    <div>
+        <h3 class="text-2xl font-semibold mt-4 mb-2">Participants ({{ event.participants.count }})</h3>
+        <ul class="list-disc list-inside text-gray-700 space-y-1">
+            {% for participant in event.participants.all %}
+                <li>{{ participant.name }} ({{ participant.email }})</li>
+            {% empty %}
+                <li class="text-gray-500">No participants registered for this event.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="mt-6 flex gap-4">
+        <a href="{% url 'event-update' event.id %}" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg">
+            Edit Event
+        </a>
+        <form action="{% url 'event-delete' event.id %}" method="POST" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg">
+                Delete Event
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

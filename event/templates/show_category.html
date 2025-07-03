@@ -1,0 +1,38 @@
+{% extends "dashboard.html" %}
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold text-gray-800 mb-6">Categories</h1>
+
+<a href="{% url 'category-create' %}" class="mb-6 inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg">
+     Add Category
+</a>
+
+<div class="overflow-x-auto">
+    <table class="w-full bg-white shadow-lg rounded-xl">
+        <thead class="bg-gray-100 text-gray-700">
+            <tr class="text-left border-b">
+                <th class="p-4">Name</th>
+                <th class="p-4">Description</th>
+                <th class="p-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-4">{{ category.name }}</td>
+                <td class="p-4">{{ category.description }}</td>
+                <td class="p-4 space-x-3">
+                    <a href="{% url 'category-update' category.id %}" class="text-blue-600 hover:underline font-medium">Edit</a>
+                    <a href="{% url 'category-delete' category.id %}" class="text-red-600 hover:underline font-medium">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center p-6 text-gray-500">No categories available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
