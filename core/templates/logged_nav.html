@@ -1,0 +1,59 @@
+<nav class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      
+      <div class="flex-shrink-0">
+        <a href="{% url 'home' %}" class="text-xl font-bold text-rose-600 hover:text-rose-700">
+          EventManager
+        </a>
+      </div>
+
+      <div class="hidden md:flex space-x-6 items-center">
+        <a href="{% url 'home' %}" class="text-gray-700 hover:text-rose-600">Home</a>
+
+        {% if user_role == 'Admin' %}
+          <a href="{% url 'admin-dashboard' %}" class="text-gray-700 hover:text-rose-600">Admin Dashboard</a>
+          <a href="{% url 'create-group' %}" class="text-gray-700 hover:text-rose-600">Create Group</a>
+          <a href="{% url 'group-list' %}" class="text-gray-700 hover:text-rose-600">Group List</a>
+        {% elif user_role == 'Organizer' %}
+          <a href="{% url 'organizer-dashboard' %}" class="text-gray-700 hover:text-rose-600">Organizer Dashboard</a>
+          <a href="{% url 'event-list' %}" class="text-gray-700 hover:text-rose-600">Manage Events</a>
+          <a href="{% url 'event-create' %}" class="text-gray-700 hover:text-rose-600">Create Event</a>
+          <a href="{% url 'category-list' %}" class="text-gray-700 hover:text-rose-600">Manage Categories</a>
+        {% elif user_role == 'Participant' %}
+          <a href="{% url 'participant-dashboard' %}" class="text-gray-700 hover:text-rose-600">My Events</a>
+          <a href="{% url 'event-list' %}" class="text-gray-700 hover:text-rose-600">All Events</a>
+        {% endif %}
+      </div>
+
+      <div class="relative inline-block text-left">
+        <button type="button" id="user-menu-button" aria-expanded="false" aria-haspopup="true" class="flex items-center text-gray-700 hover:text-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-500 rounded">
+          <span class="mr-2">{{ user.username }}</span>
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <div id="user-dropdown" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+          <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
+            <a href="{% url 'home' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-rose-100" role="menuitem">Home</a>
+            <a href="{% url 'sign-out' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-rose-100" role="menuitem">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const button = document.getElementById('user-menu-button');
+    const menu = document.getElementById('user-dropdown');
+
+    button.addEventListener('click', () => {menu.classList.toggle('hidden');});
+
+    document.addEventListener('click', (e) => {
+      if (!button.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+  </script>
+</nav>

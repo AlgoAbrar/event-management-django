@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Group List{% endblock %}
+
+{% block nav %}
+  {% include 'logged_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Groups & Permissions</h1>
+
+<table class="min-w-full border border-gray-300 rounded-md">
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="py-2 px-4 border-b">Group Name</th>
+      <th class="py-2 px-4 border-b">Permissions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for group in groups %}
+    <tr class="hover:bg-gray-50">
+      <td class="py-2 px-4 border-b">{{ group.name }}</td>
+      <td class="py-2 px-4 border-b">
+        {% for perm in group.permissions.all %}
+          <span class="inline-block bg-gray-200 rounded px-2 py-1 text-sm mr-1">{{ perm.name }}</span>
+        {% empty %}
+          <em>No permissions assigned</em>
+        {% endfor %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2" class="text-center p-4">No groups found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

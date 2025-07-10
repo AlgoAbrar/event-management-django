@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block nav %}
+  {% include 'logged_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Admin Dashboard - Users</h1>
+
+<nav class="mb-6">
+  <a href="{% url 'create-group' %}" class="text-green-600 hover:underline mr-4">Create Group</a>
+  <a href="{% url 'group-list' %}" class="text-blue-600 hover:underline">Group List</a>
+</nav>
+
+<table class="min-w-full border border-gray-300 rounded-md">
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="py-2 px-4 border-b">Username</th>
+      <th class="py-2 px-4 border-b">Full Name</th>
+      <th class="py-2 px-4 border-b">Email</th>
+      <th class="py-2 px-4 border-b">Role</th>
+      <th class="py-2 px-4 border-b">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr class="hover:bg-gray-50">
+      <td class="py-2 px-4 border-b">{{ user.username }}</td>
+      <td class="py-2 px-4 border-b">{{ user.first_name }} {{ user.last_name }}</td>
+      <td class="py-2 px-4 border-b">{{ user.email }}</td>
+      <td class="py-2 px-4 border-b">{{ user.group_name }}</td>
+      <td class="py-2 px-4 border-b">
+        <a href="{% url 'assign-role' user.id %}" class="text-blue-600 hover:underline">Assign Role</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center p-4">No users found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

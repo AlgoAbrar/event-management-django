@@ -1,12 +1,10 @@
 from django import forms
-from .models import Event, Participant, Category
+from .models import Event, Category, RSVP
 
 class StyledFormMixin:
-    
     default_classes = (
-        # "border-2 border-gray-300 w-full p-3 rounded-lg shadow-sm "
-        # "focus:outline-none focus:border-rose-500 focus:ring-rose-500"
-        "border-2 border-gray-300 w-full p-3 rounded-lg shadow-sm focus:outline-none focus:border-rose-500 focus:ring-rose-500"
+        "border-2 border-gray-300 w-full p-3 rounded-lg shadow-sm "
+        "focus:outline-none focus:border-rose-500 focus:ring-rose-500"
     )
 
     def apply_styled_widgets(self):
@@ -47,28 +45,16 @@ class StyledFormMixin:
                 })
 
 
-
 class EventForm(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['name', 'description', 'date', 'time', 'location', 'category', 'participants']
+        fields = ['name', 'description', 'date', 'time', 'location', 'category', 'image']
         widgets = {
             'description': forms.Textarea,
             'date': forms.DateInput(attrs={'type': 'date'}),
             'time': forms.TimeInput(attrs={'type': 'time'}),
-            'participants': forms.CheckboxSelectMultiple,
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.apply_styled_widgets()
-
-
-class ParticipantForm(StyledFormMixin, forms.ModelForm):
-    class Meta:
-        model = Participant
-        fields = ['name', 'email']
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.apply_styled_widgets()
@@ -81,7 +67,20 @@ class CategoryForm(StyledFormMixin, forms.ModelForm):
         widgets = {
             'description': forms.Textarea,
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.apply_styled_widgets()
+
+
+class RSVPForm(forms.ModelForm):
+    """Form RSVP to an event."""
+    class Meta:
+        model = RSVP
+        fields = ['user', 'event'] 
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        return instance

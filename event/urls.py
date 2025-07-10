@@ -2,24 +2,26 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.organizer_dashboard, name='dashboard'),
+    # Dashboard
+    path('dashboard/', views.dashboard_redirect, name='dashboard-redirect'),
 
-    #Events
-    path('events/', views.event_list, name='event-list'),
-    path('events/create/', views.event_create, name='event-create'),
-    path('events/<int:pk>/', views.event_detail, name='event-detail'),
-    path('events/update/<int:pk>/', views.event_update, name='event-update'),
-    path('events/delete/<int:pk>/', views.event_delete, name='event-delete'),
+    # Dashboards
+    path('dashboard/admin/', views.admin_dashboard, name='admin-dashboard'),
+    path('dashboard/organizer/', views.organizer_dashboard, name='organizer-dashboard'),
+    path('dashboard/participant/', views.participant_dashboard, name='participant-dashboard'),
 
-    #Participants
-    path('participants/', views.participant_list, name='participant-list'),
-    path('participants/create/', views.participant_create, name='participant-create'),
-    path('participants/update/<int:pk>/', views.participant_update, name='participant-update'),
-    path('participants/delete/<int:pk>/', views.participant_delete, name='participant-delete'),
+    # Events
+    path('', views.event_list, name='event-list'),
+    path('event/<int:pk>/', views.event_detail, name='event-detail'),
+    path('event/create/', views.event_create, name='event-create'),
+    path('event/<int:pk>/update/', views.event_update, name='event-update'),
+    path('event/<int:pk>/delete/', views.event_delete, name='event-delete'),
 
-    #Categories
+    path('event/<int:event_id>/rsvp/', views.rsvp_event, name='event-rsvp'),
+
+    # Categories
     path('categories/', views.category_list, name='category-list'),
     path('categories/create/', views.category_create, name='category-create'),
-    path('categories/update/<int:pk>/', views.category_update, name='category-update'),
-    path('categories/delete/<int:pk>/', views.category_delete, name='category-delete'),
+    path('categories/<int:pk>/update/', views.category_update, name='category-update'),
+    path('categories/<int:pk>/delete/', views.category_delete, name='category-delete'),
 ]
