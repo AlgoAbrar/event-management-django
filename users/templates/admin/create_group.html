@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Group{% endblock %}
+
+{% block nav %}
+  {% include 'logged_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Create Group</h1>
+
+<form method="post" class="max-w-lg">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Create Group</button>
+</form>
+
+{% if messages %}
+  <ul class="mt-4">
+    {% for message in messages %}
+      <li class="text-{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-4">All Events</h1>
+
+  <!-- Search -->
+  <form method="get" class="mb-6">
+    <input type="text" name="search" placeholder="Search events..." value="{{ request.GET.search }}"
+           class="border px-4 py-2 rounded-md w-full md:w-1/2">
+  </form>
+
+  {% if events %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for event in events %}
+        <div class="border rounded-lg shadow p-4 hover:shadow-md transition">
+          <h2 class="text-lg font-semibold text-rose-600">{{ event.name }}</h2>
+          <p class="text-gray-600">{{ event.date }} — {{ event.location }}</p>
+          <p class="text-sm mt-2 text-gray-500">{{ event.category.name }}</p>
+          <a href="{% url 'event-detail' event.pk %}" class="inline-block mt-3 text-rose-500 hover:underline">
+            View Details →
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-600">No events found.</p>
+  {% endif %}
+</div>
+{% endblock %}

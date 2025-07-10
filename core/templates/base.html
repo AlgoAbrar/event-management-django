@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Event Manager{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% comment %} {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> {% endcomment %}
+   <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <header class="bg-white shadow">
+        {% if user.is_authenticated %}
+            {% include "logged_nav.html" %}
+        {% else %}
+            {% include "non_logged_nav.html" %}
+        {% endif %}
+    </header>
+
+    <main class="container mx-auto mt-8 px-4">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="p-3 rounded mb-2 
+                        {% if message.tags == 'success' %}bg-green-100 text-green-800
+                        {% elif message.tags == 'error' %}bg-red-100 text-red-800
+                        {% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-gray-200 text-gray-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center py-4 mt-12">
+         Event Manager | Built by Saiyedul Abrar
+    </footer>
+</body>
+</html>

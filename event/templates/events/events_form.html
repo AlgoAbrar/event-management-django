@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ form.instance.pk|yesno:"Edit Event,Create Event" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold mb-6">
+    {% if form.instance.pk %}Edit Event{% else %}Create Event{% endif %}
+  </h2>
+  
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="mb-4">
+        <label class="block font-semibold mb-1">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <small class="text-gray-500">{{ field.help_text }}</small>
+        {% endif %}
+        {% if field.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ field.errors|striptags }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded">
+      {% if form.instance.pk %}Update{% else %}Create{% endif %}
+    </button>
+  </form>
+</div>
+{% endblock %}

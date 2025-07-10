@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white p-4 rounded shadow text-center">
+    <h2 class="text-xl font-semibold">Total Events</h2>
+    <p class="text-4xl font-bold">{{ total_events }}</p>
+  </div>
+  <div class="bg-white p-4 rounded shadow text-center">
+    <h2 class="text-xl font-semibold">Total Participants</h2>
+    <p class="text-4xl font-bold">{{ total_participants }}</p>
+  </div>
+  <div class="bg-white p-4 rounded shadow text-center">
+    <h2 class="text-xl font-semibold">Upcoming Events</h2>
+    <p class="text-4xl font-bold">{{ upcoming_events_count }}</p>
+  </div>
+</div>
+
+<div class="mb-6">
+  <h2 class="text-2xl font-semibold mb-3">Today's Events</h2>
+  {% if todays_events %}
+  <ul class="list-disc list-inside">
+    {% for event in todays_events %}
+    <li>
+      <a href="{% url 'event-detail' event.pk %}" class="text-blue-600 hover:underline">{{ event.name }}</a>
+      — {{ event.time|time:"H:i" }} at {{ event.location }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No events scheduled for today.</p>
+  {% endif %}
+</div>
+
+<div>
+  <h2 class="text-2xl font-semibold mb-3">Past Events</h2>
+  <p>{{ past_events_count }} event{{ past_events_count|pluralize }}</p>
+</div>
+{% endblock %}

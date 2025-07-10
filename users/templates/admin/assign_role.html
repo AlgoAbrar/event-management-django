@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Assign Role to {{ user.username }}{% endblock %}
+
+{% block nav %}
+  {% include 'logged_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Assign Role to {{ user.username }}</h1>
+
+<form method="post" class="max-w-md">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Assign Role</button>
+  <a href="{% url 'admin-dashboard' %}" class="ml-4 text-gray-600 hover:underline">Cancel</a>
+</form>
+
+{% endblock %}

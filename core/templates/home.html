@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Home | Event Manager{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="text-4xl font-bold mb-4">Welcome to Event Manager</h1>
+    <p class="text-lg text-gray-600 mb-6">Plan, manage, and RSVP to events easily.</p>
+
+    {% if not user.is_authenticated %}
+        <a href="{% url 'sign-in' %}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            Sign In
+        </a>
+        <a href="{% url 'sign-up' %}" class="ml-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+            Register
+        </a>
+    {% else %}
+        {% if user_role == 'Admin' %}
+            <a href="{% url 'admin-dashboard' %}" class="bg-rose-600 text-white px-6 py-2 rounded hover:bg-rose-700">
+                Go to Admin Dashboard
+            </a>
+        {% elif user_role == 'Organizer' %}
+            <a href="{% url 'organizer-dashboard' %}" class="bg-rose-600 text-white px-6 py-2 rounded hover:bg-rose-700">
+                Go to Organizer Dashboard
+            </a>
+        {% elif user_role == 'Participant' %}
+            <a href="{% url 'participant-dashboard' %}" class="bg-rose-600 text-white px-6 py-2 rounded hover:bg-rose-700">
+                Go to My Events
+            </a>
+        {% else %}
+            
+            <a href="{% url 'event-list' %}" class="bg-rose-600 text-white px-6 py-2 rounded hover:bg-rose-700">
+                Browse Events
+            </a>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
