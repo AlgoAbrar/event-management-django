@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Reset Password{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10 bg-white p-6 rounded shadow">
+    <h2 class="text-xl font-bold text-center mb-4">Password Reset</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        <button type="submit" class="mt-4 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Send Reset Email
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}All Events{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Upcoming Events</h1>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for event in events %}
+        <div class="bg-white shadow rounded p-4">
+            <img src="{{ event.image.url }}" class="h-40 w-full object-cover rounded mb-2">
+            <h2 class="text-lg font-semibold">{{ event.name }}</h2>
+            <p class="text-sm text-gray-500">{{ event.category.name }}</p>
+            <p class="text-sm text-gray-600">{{ event.date }} at {{ event.time }}</p>
+            <p class="text-sm text-gray-600 mb-2">{{ event.location }}</p>
+            <a href="{% url 'event-detail' event.id %}" class="text-blue-600 hover:underline">View Details</a>
+        </div>
+        {% empty %}
+        <p>No events found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

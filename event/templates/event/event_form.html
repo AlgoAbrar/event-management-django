@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-6 rounded shadow mt-8">
+    <h2 class="text-xl font-bold mb-4">Create New Event</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <div class="mb-4">
+                {{ field.label_tag }}<br>
+                {{ field }}
+                {% if field.errors %}
+                    <p class="text-red-500 text-sm">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Submit
+        </button>
+    </form>
+</div>
+{% endblock %}

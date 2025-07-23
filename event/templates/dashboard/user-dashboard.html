@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}My RSVP’d Events{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold mb-4">Events You've RSVP’d</h2>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for event in events %}
+        <div class="bg-white shadow rounded p-4">
+            <img src="{{ event.image.url }}" class="h-40 w-full object-cover rounded mb-2">
+            <h2 class="text-lg font-semibold">{{ event.name }}</h2>
+            <p class="text-sm text-gray-500">{{ event.category.name }}</p>
+            <p class="text-sm text-gray-600">{{ event.date }} at {{ event.time }}</p>
+            <a href="{% url 'event-detail' event.id %

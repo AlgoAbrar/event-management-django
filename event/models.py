@@ -1,7 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 
+User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -17,38 +18,17 @@ class Event(models.Model):
     date = models.DateField()
     time = models.TimeField()
     location = models.CharField(max_length=255)
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name='events'
-    )
-    image = models.ImageField(
-        upload_to='event_images/',
-        default='event_images/default.jpg',
-        blank=True,
-        null=True
-    )
-    participants = models.ManyToManyField(
-        User,
-        through='RSVP',
-        related_name='rsvp_events'
-    )
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='events')
+    image = models.ImageField(upload_to='event_images/', default='event_images/default.jpg', blank=True, null=True)
+    participants = models.ManyToManyField(User, through='RSVP', related_name='rsvp_events')
 
     def __str__(self):
         return self.name
 
 
 class RSVP(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='rsvps'
-    )
-    event = models.ForeignKey(
-        Event,
-        on_delete=models.CASCADE,
-        related_name='rsvps'
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rsvps')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='rsvps')
     timestamp = models.DateTimeField(default=timezone.now)
 
     class Meta:

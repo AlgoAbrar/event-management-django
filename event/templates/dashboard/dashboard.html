@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold mb-6">Admin Dashboard</h2>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="text-gray-500 text-sm">Total Events</h3>
+            <p class="text-2xl font-bold">{{ counts.total }}</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="text-gray-500 text-sm">Past Events</h3>
+            <p class="text-2xl font-bold">{{ counts.completed }}</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="text-gray-500 text-sm">Upcoming Events</h3>
+            <p class="text-2xl font-bold">{{ counts.in_progress }}</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow">
+            <h3 class="text-gray-500 text-sm">Total Participants</h3>
+            <p class="text-2xl font-bold">{{ counts.pending }}</p>
+        </div>
+    </div>
+
+    <!-- Today's Events -->
+    <h3 class="text-xl font-semibold mb-2">Today's Events</h3>
+    <div class="space-y-2">
+        {% for event in today_events %}
+        <div class="bg-gray-50 p-4 border rounded">
+            <p class="font-medium">{{ event.name }}</p>
+            <p class="text-sm text-gray-600">{{ event.time }} at {{ event.location }}</p>
+        </div>
+        {% empty %}
+        <p>No events scheduled for today.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

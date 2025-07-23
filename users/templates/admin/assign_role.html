@@ -1,20 +1,22 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Assign Role to {{ user.username }}{% endblock %}
-
-{% block nav %}
-  {% include 'logged_nav.html' %}
-{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Assign Role{% endblock %}
 
 {% block content %}
-<h1 class="text-3xl font-bold mb-6">Assign Role to {{ user.username }}</h1>
+<div class="max-w-md mx-auto p-6 bg-white rounded shadow mt-10">
+  <h2 class="text-xl font-semibold mb-6">Assign Role to {{ user.username }}</h2>
 
-<form method="post" class="max-w-md">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Assign Role</button>
-  <a href="{% url 'admin-dashboard' %}" class="ml-4 text-gray-600 hover:underline">Cancel</a>
-</form>
+  <form method="POST">
+    {% csrf_token %}
+    <label for="groups" class="block text-sm font-medium text-gray-700 mb-2">Select Role(s)</label>
+    <select id="groups" name="groups" class="w-full border border-gray-300 rounded p-2" multiple>
+      {% for group in groups %}
+      <option value="{{ group.id }}" {% if group in user.groups.all %}selected{% endif %}>{{ group.name }}</option>
+      {% endfor %}
+    </select>
 
+    <button type="submit" class="mt-4 w-full bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+      Update Role
+    </button>
+  </form>
+</div>
 {% endblock %}

@@ -1,27 +1,21 @@
 from django.urls import path
-from . import views
+from .views import show_events, event_detail, create_event,organizer_dashboard, user_dashboard, participants_list
+from .views import EventDetailView,DeleteEventView,EditEventView,ParticipantsListView,CreateEventView
+from .views import edit_event, delete_event
 
 urlpatterns = [
-    # Dashboard
-    path('dashboard/', views.dashboard_redirect, name='dashboard-redirect'),
-
-    # Dashboards
-    path('dashboard/admin/', views.admin_dashboard, name='admin-dashboard'),
-    path('dashboard/organizer/', views.organizer_dashboard, name='organizer-dashboard'),
-    path('dashboard/participant/', views.participant_dashboard, name='participant-dashboard'),
-
-    # Events
-    path('', views.event_list, name='event-list'),
-    path('event/<int:pk>/', views.event_detail, name='event-detail'),
-    path('event/create/', views.event_create, name='event-create'),
-    path('event/<int:pk>/update/', views.event_update, name='event-update'),
-    path('event/<int:pk>/delete/', views.event_delete, name='event-delete'),
-
-    path('event/<int:event_id>/rsvp/', views.rsvp_event, name='event-rsvp'),
-
-    # Categories
-    path('categories/', views.category_list, name='category-list'),
-    path('categories/create/', views.category_create, name='category-create'),
-    path('categories/<int:pk>/update/', views.category_update, name='category-update'),
-    path('categories/<int:pk>/delete/', views.category_delete, name='category-delete'),
+    path('', show_events, name='show-events'),
+    # path('event/<int:event_id>/', event_detail, name='event-detail'),
+    path('event/<int:event_id>/', EventDetailView.as_view(), name='event-detail'),
+    #path('create/', create_event, name='create-event'),
+    path('event/create/', CreateEventView.as_view(), name='create-event'),
+    path('organizer/dashboard/', organizer_dashboard, name='organizer-dashboard'),
+    path('user/dashboard/', user_dashboard, name='user-dashboard'),
+    #path('participants/', participants_list, name='participants-list'),
+    path('participants/', ParticipantsListView.as_view(), name='participants-list'),
+    # path('event/<int:event_id>/edit/', edit_event, name='edit-event'),
+    path('event/<int:pk>/edit/', EditEventView.as_view(), name='edit-event'),
+    # path('event/<int:event_id>/delete/', delete_event, name='delete-event'),
+    path('event/<int:event_id>/delete/', DeleteEventView.as_view(), name='delete-event'),
+    
 ]

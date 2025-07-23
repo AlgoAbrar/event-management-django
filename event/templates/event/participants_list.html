@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Participants List{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Participants List</h2>
+<table class="min-w-full bg-white">
+  <thead>
+    <tr>
+      <th class="py-2 px-4 border-b">Event</th>
+      <th class="py-2 px-4 border-b">Participant</th>
+      <th class="py-2 px-4 border-b">RSVP Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rsvp in rsvps %}
+      <tr>
+        <td class="border px-4 py-2">{{ rsvp.event.title }}</td>
+        <td class="border px-4 py-2">{{ rsvp.user.get_full_name }}</td>
+        <td class="border px-4 py-2">{{ rsvp.created_at|date:"Y-m-d" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3" class="text-center py-4">No participants found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

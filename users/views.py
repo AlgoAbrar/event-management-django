@@ -1,23 +1,20 @@
-from django.shortcuts import render, redirect, HttpResponse
-from django.contrib.auth.models import User, Group
-from django.contrib.auth import login, logout
-from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Prefetch
+from django.contrib.auth.models import Group
 from django.contrib import messages
-from users.forms import CustomRegistrationForm, AssignRoleForm, CreateGroupForm, LoginForm
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
+from django.urls import reverse_lazy
+from .models import CustomUser
+from .forms import CustomUserCreationForm, LoginForm, ProfileUpdateForm, PasswordChangeForm
+from django.views.decorators.http import require_POST
+from django.http import HttpResponse
 
-# Role
-def get_user_role(user):
-    if user.is_authenticated:
-        if user.groups.filter(name='Admin').exists():
-            return 'Admin'
-        elif user.groups.filter(name='Organizer').exists():
-            return 'Organizer'
-        elif user.groups.filter(name='Participant').exists():
-            return 'Participant'
-    return None
 
+# ROLES
 def is_admin(user):
     return user.groups.filter(name='Admin').exists()
 
@@ -27,124 +24,168 @@ def is_organizer(user):
 def is_participant(user):
     return user.groups.filter(name='Participant').exists()
 
-# Signup view
+
+# SIGN UP
 def sign_up(request):
-    form = CustomRegistrationForm()
     if request.method == 'POST':
-        form = CustomRegistrationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data.get('password1'))
-            user.is_active = False 
+            user.is_active = False  
             user.save()
-            messages.success(request, 'A confirmation email has been sent. Please check your inbox to activate your account.')
+            messages.success(request, 'Account created. Check your email to activate.')
             return redirect('sign-in')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    return render(request, 'registration/register.html', {"form": form})
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
 
-# Login view
-def sign_in(request):
-    form = LoginForm()
-    if request.method == 'POST':
-        form = LoginForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            if not user.is_active:
-                messages.error(request, 'Your account is not activated. Please check your email.')
-                return redirect('sign-in')
-            login(request, user)
 
-            
-            if is_admin(user):
-                return redirect('admin-dashboard')
-            elif is_organizer(user):
-                return redirect('organizer-dashboard')  
-            elif is_participant(user):
-                return redirect('participant-dashboard')  
-            else:
-                return redirect('home')
-    return render(request, 'registration/login.html', {'form': form})
-
-@login_required
-def sign_out(request):
-    if request.method == 'POST':
-        logout(request)
-        return redirect('sign-in')
-    
-    return render(request, 'registration/logout.html')
-
-# Account activation
-# def activate_user(request, user_id, token):
-#     try:
-#         user = User.objects.get(id=user_id)
-#         if default_token_generator.check_token(user, token):
-#             user.is_active = True
-#             user.save()
-#             messages.success(request, 'Your account has been activated successfully. You can now log in.')
-#             return redirect('sign-in')
-#         else:
-#             return HttpResponse('Invalid activation link or token.', status=400)
-#     except User.DoesNotExist:
-#         return HttpResponse('User not found.', status=404)
-
+# ACTIVATE ACCOUNT
 def activate_user(request, user_id, token):
     try:
-        user = User.objects.get(id=user_id)
+        user = CustomUser.objects.get(id=user_id)
+
         if default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
+            messages.success(request, 'Your account has been activated. Please log in.')
             return redirect('sign-in')
         else:
-            return HttpResponse('Invalid Id or token')
+            return HttpResponse('Invalid activation link.')
 
-    except User.DoesNotExist:
-        return HttpResponse('User not found')
+    except CustomUser.DoesNotExist:
+        return HttpResponse('Activation failed. User not found.')
 
-# Admin dashboard
-@user_passes_test(is_admin, login_url='no-permission')
+# SIGN IN
+def sign_in(request):
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            # Redirect based on role
+            if is_admin(user):
+                return redirect('admin-dashboard')
+            elif is_organizer(user):
+                return redirect('organizer-dashboard')
+            elif is_participant(user):
+                return redirect('user-dashboard')
+            else:
+                return redirect('home')
+    else:
+        form = LoginForm()
+    return render(request, 'registration/login.html', {'form': form})
+
+
+# LOGOUT
+@login_required
+def sign_out(request):
+    logout(request)
+    messages.info(request, 'You have been logged out.')
+    return redirect('sign-in')
+
+
+# PROFILE VIEW
+@login_required
+def profile(request):
+    return render(request, 'accounts/profile.html', {'user': request.user})
+
+
+# EDIT PROFILE
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated.')
+            return redirect('profile')
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+    return render(request, 'accounts/update_profile.html', {'form': form})
+
+
+# CHANGE PASSWORD
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.POST)
+        if form.is_valid():
+            if not request.user.check_password(form.cleaned_data['old_password']):
+                form.add_error('old_password', 'Incorrect current password')
+            elif form.cleaned_data['new_password1'] != form.cleaned_data['new_password2']:
+                form.add_error('new_password2', 'Passwords do not match')
+            else:
+                request.user.set_password(form.cleaned_data['new_password1'])
+                request.user.save()
+                update_session_auth_hash(request, request.user)
+                messages.success(request, 'Password changed successfully.')
+                return redirect('profile')
+    else:
+        form = PasswordChangeForm()
+    return render(request, 'accounts/password_change.html', {'form': form})
+
+
+# ADMIN DASHBOARD
+@login_required
+@user_passes_test(is_admin)
 def admin_dashboard(request):
-    users = User.objects.prefetch_related(
-        Prefetch('groups', queryset=Group.objects.all(), to_attr='all_groups')
-    ).all()
+    users = CustomUser.objects.all()
+    return render(request, 'admin/dashboard.html', {'users': users})
 
-    for user in users:
-        user.group_name = user.all_groups[0].name if user.all_groups else 'No Group Assigned'
 
-    return render(request, 'admin/dashboard.html', {"users": users})
-
-# Admin assign roles
-@user_passes_test(is_admin, login_url='no-permission')
-def assign_role(request, user_id):
-    user = User.objects.get(id=user_id)
-    form = AssignRoleForm()
-
-    if request.method == 'POST':
-        form = AssignRoleForm(request.POST)
-        if form.is_valid():
-            role = form.cleaned_data.get('role')
-            user.groups.clear()
-            user.groups.add(role)
-            messages.success(request, f"User {user.username} has been assigned the role '{role.name}'.")
-            return redirect('admin-dashboard')
-
-    return render(request, 'admin/assign_role.html', {"form": form, "user": user})
-
-# Admin create groups roles
-@user_passes_test(is_admin, login_url='no-permission')
+# CREATE GROUP
+@login_required
+@user_passes_test(is_admin)
 def create_group(request):
-    form = CreateGroupForm()
     if request.method == 'POST':
-        form = CreateGroupForm(request.POST)
-        if form.is_valid():
-            group = form.save()
-            messages.success(request, f"Group '{group.name}' has been created successfully.")
-            return redirect('create-group')
+        name = request.POST.get('name')
+        if name:
+            Group.objects.get_or_create(name=name)
+            messages.success(request, f"Group '{name}' created.")
+            return redirect('group-list')
+    return render(request, 'admin/create_group.html')
 
-    return render(request, 'admin/create_group.html', {'form': form})
 
-# Admin view
-@user_passes_test(is_admin, login_url='no-permission')
+# GROUP LIST
+@login_required
+@user_passes_test(is_admin)
 def group_list(request):
-    groups = Group.objects.prefetch_related('permissions').all()
+    groups = Group.objects.all()
     return render(request, 'admin/group_list.html', {'groups': groups})
+
+# ASSIGN ROLE
+@login_required
+@user_passes_test(is_admin)
+def assign_role(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    groups = Group.objects.all()
+
+    if request.method == 'POST':
+        group_name = request.POST.get('group')
+        try:
+            group = Group.objects.get(name=group_name)
+            user.groups.clear()
+            user.groups.add(group)
+            messages.success(request, f"{user.username} is now a {group.name}.")
+            return redirect('admin-dashboard')
+        except Group.DoesNotExist:
+            messages.error(request, f"Group '{group_name}' does not exist. Please create it first.")
+            return redirect('create-group')  # or redirect back to assign-role if you prefer
+
+    return render(request, 'admin/assign_role.html', {'user_obj': user, 'groups': groups})
+
+@login_required
+@user_passes_test(is_admin)
+@require_POST
+def delete_group(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+        if group.name == 'Admin':
+            messages.error(request, "Cannot delete the Admin group.")
+        else:
+            group.delete()
+            messages.success(request, f"Group '{group.name}' deleted.")
+    except Group.DoesNotExist:
+        messages.error(request, "Group not found.")
+    return redirect('group-list')

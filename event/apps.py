@@ -6,3 +6,5 @@ class EventConfig(AppConfig):
 
     def ready(self):
         import event.signals
+        
+    

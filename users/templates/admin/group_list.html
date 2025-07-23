@@ -1,37 +1,34 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Group List{% endblock %}
-
-{% block nav %}
-  {% include 'logged_nav.html' %}
-{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Groups List{% endblock %}
 
 {% block content %}
-<h1 class="text-3xl font-bold mb-6">Groups & Permissions</h1>
+<div class="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-10">
+  <h2 class="text-2xl font-semibold mb-6">Groups</h2>
 
-<table class="min-w-full border border-gray-300 rounded-md">
-  <thead class="bg-gray-100">
-    <tr>
-      <th class="py-2 px-4 border-b">Group Name</th>
-      <th class="py-2 px-4 border-b">Permissions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for group in groups %}
-    <tr class="hover:bg-gray-50">
-      <td class="py-2 px-4 border-b">{{ group.name }}</td>
-      <td class="py-2 px-4 border-b">
-        {% for perm in group.permissions.all %}
-          <span class="inline-block bg-gray-200 rounded px-2 py-1 text-sm mr-1">{{ perm.name }}</span>
-        {% empty %}
-          <em>No permissions assigned</em>
-        {% endfor %}
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="2" class="text-center p-4">No groups found.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group Name</th>
+        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for group in groups %}
+      <tr class="border-t">
+        <td class="px-6 py-4">{{ group.name }}</td>
+        <td class="px-6 py-4 text-right">
+          <form method="POST" action="{% url 'delete-group' group.id %}" onsubmit="return confirm('Are you sure you want to delete this group?');" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="2" class="px-6 py-4 text-center text-gray-500">No groups available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
