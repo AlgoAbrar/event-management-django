@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import show_events, event_detail, create_event,organizer_dashboard, user_dashboard, participants_list
+from .views import show_events, organizer_dashboard, user_dashboard
 from .views import EventDetailView,DeleteEventView,EditEventView,ParticipantsListView,CreateEventView
-from .views import edit_event, delete_event
 
 urlpatterns = [
     path('', show_events, name='show-events'),
