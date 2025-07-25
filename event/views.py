@@ -114,21 +114,6 @@ class ParticipantsListView(LoginRequiredMixin, UserPassesTestMixin, View):
         return render(request, 'event/participants_list.html', {'rsvps': rsvps})
 
 
-# @login_required
-# @user_passes_test(lambda u: is_organizer(u) or is_admin(u))
-# def edit_event(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
-
-#     if request.method == 'POST':
-#         form = EventForm(request.POST, request.FILES, instance=event)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Event updated successfully.')
-#             return redirect('organizer-dashboard')
-#     else:
-#         form = EventForm(instance=event)
-
-#     return render(request, 'event/event_form.html', {'form': form, 'edit': True})
 class EditEventView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Event
     form_class = EventForm
