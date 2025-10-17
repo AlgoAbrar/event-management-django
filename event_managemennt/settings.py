@@ -106,7 +106,7 @@ DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
         
-        default='postgresql://event_manager_dbb_user:kv06ZUPdqEORPS6Pd0xuRjrAAlc8D8Em@dpg-d20bjbje5dus73d7mqtg-a.oregon-postgres.render.com/event_manager_dbb',
+        default='postgresql://event_manager_dbb_82fo_user:CtzTlaGOlVre7pbtStp82RnNsxLpwWUr@dpg-d3ornf63jp1c739mm4j0-a.oregon-postgres.render.com/event_manager_dbb_82fo',
         conn_max_age=600
     )
 }
